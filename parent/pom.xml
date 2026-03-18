@@ -41,6 +41,7 @@
         <hawtdispatch.version>1.22</hawtdispatch.version>
         <hawtbuf.version>1.11</hawtbuf.version>
         <exam.version>4.13.5</exam.version>
+        <paxlogging.version>2.2.7</paxlogging.version>
     </properties>
 
     <dependencies>

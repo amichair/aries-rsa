@@ -80,8 +80,8 @@
         </dependency>
         <dependency>
             <groupId>org.ops4j.pax.logging</groupId>
-            <artifactId>pax-logging-service</artifactId>
-            <version>1.11.17</version>
+            <artifactId>pax-logging-log4j2</artifactId>
+            <version>${paxlogging.version}</version>
         </dependency>
     </dependencies>
 </project>
