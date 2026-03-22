@@ -79,16 +79,19 @@ public class EventAdminPublisherTest {
                 Assert.assertEquals(42L, event.getProperty("bundle.id"));
                 Assert.assertEquals("test.bundle", event.getProperty("bundle.symbolicname"));
                 Assert.assertEquals(new Version(1, 2, 3, "test"), event.getProperty("bundle.version"));
-                Assert.assertNull(event.getProperty("cause"));
-                Assert.assertEquals(epd, event.getProperty("export.registration"));
+                Assert.assertNull(event.getProperty("exception"));
+                Assert.assertNull(event.getProperty("exception.message"));
+                Assert.assertNull(event.getProperty("exception.class"));
 
-                Assert.assertEquals(Long.MAX_VALUE, event.getProperty("service.remote.id"));
-                Assert.assertEquals(uuid, event.getProperty("service.remote.uuid"));
-                Assert.assertEquals("foo://bar", event.getProperty("service.remote.uri"));
-                Assert.assertArrayEquals(interfaces.toArray(new String[]{}),
-                        (String[]) event.getProperty("objectClass"));
+                Assert.assertEquals(Long.MAX_VALUE, event.getProperty("endpoint.service.id"));
+                Assert.assertEquals(uuid, event.getProperty("endpoint.framework.uuid"));
+                Assert.assertEquals("foo://bar", event.getProperty("endpoint.id"));
+                Assert.assertArrayEquals(interfaces.toArray(new String[]{}), (String[]) event.getProperty("objectClass"));
+                Assert.assertEquals(epd.getConfigurationTypes(), event.getProperty("service.imported.configs"));
 
                 Assert.assertNotNull(event.getProperty("timestamp"));
+                Assert.assertTrue((Long)event.getProperty("timestamp") <= System.currentTimeMillis());
+                Assert.assertTrue((Long)event.getProperty("timestamp") > System.currentTimeMillis() - 30000);
 
                 RemoteServiceAdminEvent rsae = (RemoteServiceAdminEvent) event.getProperty("event");
                 Assert.assertNull(rsae.getException());
@@ -155,10 +158,11 @@ public class EventAdminPublisherTest {
                 Assert.assertEquals(42L, event.getProperty("bundle.id"));
                 Assert.assertEquals("test.bundle", event.getProperty("bundle.symbolicname"));
                 Assert.assertEquals(new Version("0"), event.getProperty("bundle.version"));
-                Assert.assertSame(exportException, event.getProperty("cause"));
-                Assert.assertEquals(epd, event.getProperty("export.registration"));
-                Assert.assertArrayEquals(new String[]{"org.foo.Bar"},
-                        (String[]) event.getProperty("objectClass"));
+                Assert.assertSame(exportException, event.getProperty("exception"));
+                Assert.assertSame(exportException.getMessage(), event.getProperty("exception.message"));
+                Assert.assertSame(exportException.getClass().getName(), event.getProperty("exception.class"));
+                Assert.assertEquals(epd.getConfigurationTypes(), event.getProperty("service.imported.configs"));
+                Assert.assertArrayEquals(new String[]{"org.foo.Bar"}, (String[]) event.getProperty("objectClass"));
 
                 RemoteServiceAdminEvent rsae = (RemoteServiceAdminEvent) event.getProperty("event");
                 Assert.assertSame(exportException, rsae.getException());

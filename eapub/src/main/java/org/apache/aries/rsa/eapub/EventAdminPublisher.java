@@ -20,7 +20,11 @@ package org.apache.aries.rsa.eapub;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.security.cert.X509Certificate;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -28,6 +32,8 @@ import org.osgi.framework.*;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
+import org.osgi.service.remoteserviceadmin.ExportReference;
+import org.osgi.service.remoteserviceadmin.ImportReference;
 import org.osgi.service.remoteserviceadmin.RemoteServiceAdminEvent;
 import org.osgi.service.remoteserviceadmin.RemoteServiceAdminListener;
 import org.slf4j.Logger;
@@ -46,32 +52,44 @@ public class EventAdminPublisher implements RemoteServiceAdminListener {
     private Map<String, Object> createProps(RemoteServiceAdminEvent rsae) {
         Map<String, Object> props = new HashMap<>();
         // bundle properties
-        Bundle bundle = context.getBundle();
-        String version = bundle.getHeaders().get("Bundle-Version");
-        Version v = version != null ? new Version(version) : Version.emptyVersion;
+        Bundle bundle = rsae.getSource();
         props.put("bundle", bundle);
         props.put("bundle.id", bundle.getBundleId());
         props.put("bundle.symbolicname", bundle.getSymbolicName());
-        putIfNotNull(props, "bundle.version", v);
 
-        // exception properties
-        putIfNotNull(props, "cause", rsae.getException());
+        String version = bundle.getHeaders().get("Bundle-Version");
+        Version v = version != null ? new Version(version) : Version.emptyVersion;
+        putIfNotNull(props, "bundle.version", v); // for backwards-compatibility
 
-        // endpoint properties
-        EndpointDescription endpoint = null;
-        if (rsae.getImportReference() != null) {
-            endpoint = rsae.getImportReference().getImportedEndpoint();
-            putIfNotNull(props, "import.registration", endpoint);
-        } else if (rsae.getExportReference() != null) {
-            endpoint = rsae.getExportReference().getExportedEndpoint();
-            putIfNotNull(props, "export.registration", endpoint);
+        Map<X509Certificate, List<X509Certificate>> signers = bundle.getSignerCertificates(Bundle.SIGNERS_ALL);
+        if (signers != null) {
+            String[] names = signers.keySet().stream()
+                .map(cert -> cert.getSubjectX500Principal().getName())
+                    .filter(s -> s != null && !s.isEmpty())
+                    .toArray(String[]::new);
+            if (names.length > 0) {
+                props.put("bundle.signer", names);
+            }
         }
 
+        // exception properties
+        Throwable exception = rsae.getException();
+        if (exception != null) {
+            props.put("exception", exception);
+            props.put("exception.class", exception.getClass().getName());
+            putIfNotNull(props, "exception.message", exception.getMessage());
+        }
+
+        // endpoint properties
+        ImportReference importReference = rsae.getImportReference();
+        ExportReference exportReference = rsae.getExportReference();
+        EndpointDescription endpoint = importReference == null ? null : importReference.getImportedEndpoint();
+        endpoint = endpoint == null && exportReference != null ? exportReference.getExportedEndpoint() : endpoint;
         if (endpoint != null) {
-            putIfNotNull(props, "service.remote.id", endpoint.getServiceId());
-            putIfNotNull(props, "service.remote.uuid", endpoint.getFrameworkUUID());
-            putIfNotNull(props, "service.remote.uri", endpoint.getId());
-            putIfNotNull(props, "objectClass", endpoint.getInterfaces().toArray(new String[0]));
+            putIfNotNull(props, "endpoint.service.id", endpoint.getServiceId());
+            putIfNotNull(props, "endpoint.framework.uuid", endpoint.getFrameworkUUID());
+            putIfNotNull(props, "endpoint.id", endpoint.getId());
+            props.put("objectClass", endpoint.getInterfaces().toArray(new String[0]));
             putIfNotNull(props, "service.imported.configs", endpoint.getConfigurationTypes());
         }
 
