@@ -39,7 +39,7 @@ import org.osgi.service.remoteserviceadmin.ExportReference;
 import org.osgi.service.remoteserviceadmin.RemoteServiceAdminEvent;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
-public class EventAdminHelperTest {
+public class EventAdminPublisherTest {
 
     @Test
     public void testPublishNotification() throws Exception {
@@ -119,7 +119,7 @@ public class EventAdminHelperTest {
                 er,
                 null
         );
-        new EventAdminHelper(bc).remoteAdminEvent(event);
+        new EventAdminPublisher(bc).remoteAdminEvent(event);
         EasyMock.verify(epd, sref, er, ea, eaSref, bc);
     }
 
@@ -190,7 +190,7 @@ public class EventAdminHelperTest {
                 er,
                 exportException
         );
-        new EventAdminHelper(bc).remoteAdminEvent(event);
+        new EventAdminPublisher(bc).remoteAdminEvent(event);
         EasyMock.verify(epd, sref, er, ea, eaSref, bc);
     }
 }

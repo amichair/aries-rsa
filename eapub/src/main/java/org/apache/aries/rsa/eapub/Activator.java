@@ -29,7 +29,7 @@ public class Activator implements BundleActivator {
 
     public void start(BundleContext bundlecontext) throws Exception {
         registration = bundlecontext.registerService(
-                RemoteServiceAdminListener.class, new EventAdminHelper(bundlecontext), null);
+            RemoteServiceAdminListener.class, new EventAdminPublisher(bundlecontext), null);
     }
 
     public void stop(BundleContext context) throws Exception {
