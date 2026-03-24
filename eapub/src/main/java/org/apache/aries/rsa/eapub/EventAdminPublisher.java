@@ -111,25 +111,20 @@ public class EventAdminPublisher implements RemoteServiceAdminListener {
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
     private void notifyEventAdmins(String type, Event event) {
-        // get all EventAdmin service references
-        ServiceReference[] refs = null;
-        try {
-            refs = context.getAllServiceReferences(EventAdmin.class.getName(), null);
-        } catch (InvalidSyntaxException ise) {
-            LOG.error("Failed to get EventAdmins: {}", ise.getMessage(), ise);
-        }
-
-        // post the event to each EventAdmin
-        if (refs != null) {
-            LOG.debug("Publishing event {} to {} EventAdmins", type, refs.length);
-            for (ServiceReference serviceReference : refs) {
-                EventAdmin eventAdmin = (EventAdmin) context.getService(serviceReference);
+        // according to the EventAdmin specs, we publish to the service with the
+        // highest ranking (which is the one returned by getServiceReference)
+        ServiceReference<EventAdmin> sref = context.getServiceReference(EventAdmin.class);
+        if (sref != null) {
+            LOG.debug("Publishing event {} to EventAdmin", type);
+            final EventAdmin eventAdmin = context.getService(sref);
+            if (eventAdmin != null) {
                 try {
-                    eventAdmin.postEvent(event);
+                    AccessController.doPrivileged((PrivilegedAction<Void>) () -> {
+                        eventAdmin.postEvent(event);
+                        return null;
+                    });
                 } finally {
-                    if (eventAdmin != null) {
-                        context.ungetService(serviceReference);
-                    }
+                    context.ungetService(sref);
                 }
             }
         }

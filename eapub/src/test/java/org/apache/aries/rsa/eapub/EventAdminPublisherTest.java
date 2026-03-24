@@ -111,8 +111,7 @@ public class EventAdminPublisherTest {
 
         BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
         EasyMock.expect(bc.getBundle()).andReturn(bundle).anyTimes();
-        EasyMock.expect(bc.getAllServiceReferences(EventAdmin.class.getName(), null))
-            .andReturn(new ServiceReference[] {eaSref}).anyTimes();
+        EasyMock.expect(bc.getServiceReference(EventAdmin.class)).andReturn(eaSref).anyTimes();
         EasyMock.expect(bc.getService(eaSref)).andReturn(ea).anyTimes();
         EasyMock.replay(bc);
 
@@ -183,8 +182,7 @@ public class EventAdminPublisherTest {
         BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
 
         EasyMock.expect(bc.getBundle()).andReturn(bundle).anyTimes();
-        EasyMock.expect(bc.getAllServiceReferences(EventAdmin.class.getName(), null))
-            .andReturn(new ServiceReference[] {eaSref}).anyTimes();
+        EasyMock.expect(bc.getServiceReference(EventAdmin.class)).andReturn(eaSref).anyTimes();
         EasyMock.expect(bc.getService(eaSref)).andReturn(ea).anyTimes();
         EasyMock.replay(bc);
 
