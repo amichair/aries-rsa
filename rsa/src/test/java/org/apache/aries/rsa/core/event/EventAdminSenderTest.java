@@ -16,13 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.aries.rsa.eapub;
-
-import java.util.Arrays;
-import java.util.Dictionary;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.UUID;
+package org.apache.aries.rsa.core.event;
 
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
@@ -38,8 +32,10 @@ import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.ExportReference;
 import org.osgi.service.remoteserviceadmin.RemoteServiceAdminEvent;
 
+import java.util.*;
+
 @SuppressWarnings({"rawtypes", "unchecked"})
-public class EventAdminPublisherTest {
+public class EventAdminSenderTest {
 
     @Test
     public void testPublishNotification() throws Exception {
@@ -121,7 +117,7 @@ public class EventAdminPublisherTest {
                 er,
                 null
         );
-        new EventAdminPublisher(bc).remoteAdminEvent(event);
+        new EventAdminSender(bc).send(event);
         EasyMock.verify(epd, sref, er, ea, eaSref, bc);
     }
 
@@ -192,7 +188,7 @@ public class EventAdminPublisherTest {
                 er,
                 exportException
         );
-        new EventAdminPublisher(bc).remoteAdminEvent(event);
+        new EventAdminSender(bc).send(event);
         EasyMock.verify(epd, sref, er, ea, eaSref, bc);
     }
 }
