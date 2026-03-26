@@ -90,14 +90,14 @@ public class TcpProviderTest {
         Map<String, Object> props = new HashMap<>();
         EndpointHelper.addObjectClass(props, exportedInterfaces);
         int port = getFreePort();
-        props.put("aries.rsa.hostname", "localhost");
-        props.put("aries.rsa.port", port);
-        props.put("aries.rsa.numThreads", NUM_THREADS);
+        props.put("aries.tcp.hostname", "localhost");
+        props.put("aries.tcp.port", port);
+        props.put("aries.tcp.numThreads", NUM_THREADS);
         props.put("osgi.basic.timeout", TIMEOUT);
         BundleContext bc = EasyMock.mock(BundleContext.class);
-        props.put("aries.rsa.id", "service1");
+        props.put("aries.tcp.id", "service1");
         ep = provider.exportService(new MyServiceImpl("service1"), bc, props, exportedInterfaces);
-        props.put("aries.rsa.id", "service2");
+        props.put("aries.tcp.id", "service2");
         ep2 = provider.exportService(new MyServiceImpl("service2"), bc, props, exportedInterfaces);
         assertThat(ep.description().getId(), startsWith("tcp://localhost:"));
         importedService = provider.importEndpoint(
@@ -164,8 +164,8 @@ public class TcpProviderTest {
 
     @Test
     public void testCallSharedPort() {
-        Object port1 = ep.description().getProperties().get("aries.rsa.port");
-        Object port2 = ep2.description().getProperties().get("aries.rsa.port");
+        Object port1 = ep.description().getProperties().get("aries.tcp.port");
+        Object port2 = ep2.description().getProperties().get("aries.tcp.port");
         assertEquals(port1, port2);
         assertEquals("service1", myServiceProxy.getId());
         assertEquals("service2", myServiceProxy2.getId());

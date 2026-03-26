@@ -85,91 +85,91 @@ public class TcpProviderTLSTest {
     @Test
     public void testNoTLS() throws IOException {
         HashMap<String, Object> providerProps = new HashMap<>();
-        providerProps.put("aries.rsa.keyStore", "");
-        providerProps.put("aries.rsa.trustStore", null);
-        providerProps.put("aries.rsa.keyStorePassword", "asdf");
-        providerProps.put("aries.rsa.trustStorePassword", "asdf");
-        providerProps.put("aries.rsa.keyAlias", "asdf");
-        providerProps.put("aries.rsa.mtls", "false");
+        providerProps.put("aries.tcp.keyStore", "");
+        providerProps.put("aries.tcp.trustStore", null);
+        providerProps.put("aries.tcp.keyStorePassword", "asdf");
+        providerProps.put("aries.tcp.trustStorePassword", "asdf");
+        providerProps.put("aries.tcp.keyAlias", "asdf");
+        providerProps.put("aries.tcp.mtls", "false");
         test(providerProps);
     }
 
     @Test(expected = RuntimeException.class)
     public void testWrongPassword() throws IOException {
         HashMap<String, Object> providerProps = new HashMap<>();
-        providerProps.put("aries.rsa.keyStore", KEYSTORE);
-        providerProps.put("aries.rsa.trustStore", TRUSTSTORE);
-        providerProps.put("aries.rsa.keyStorePassword", "asdf");
-        providerProps.put("aries.rsa.trustStorePassword", "asdf");
+        providerProps.put("aries.tcp.keyStore", KEYSTORE);
+        providerProps.put("aries.tcp.trustStore", TRUSTSTORE);
+        providerProps.put("aries.tcp.keyStorePassword", "asdf");
+        providerProps.put("aries.tcp.trustStorePassword", "asdf");
         test(providerProps);
     }
 
     @Test
     public void testTLS() throws IOException {
         HashMap<String, Object> providerProps = new HashMap<>();
-        providerProps.put("aries.rsa.keyStore", KEYSTORE);
-        providerProps.put("aries.rsa.trustStore", TRUSTSTORE);
-        providerProps.put("aries.rsa.keyStorePassword", KEYSTORE_PASSWORD);
-        providerProps.put("aries.rsa.trustStorePassword", TRUSTSTORE_PASSWORD);
+        providerProps.put("aries.tcp.keyStore", KEYSTORE);
+        providerProps.put("aries.tcp.trustStore", TRUSTSTORE);
+        providerProps.put("aries.tcp.keyStorePassword", KEYSTORE_PASSWORD);
+        providerProps.put("aries.tcp.trustStorePassword", TRUSTSTORE_PASSWORD);
         test(providerProps);
     }
 
     @Test(expected = ServiceException.class)
     public void testWrongKey() throws IOException {
         HashMap<String, Object> providerProps = new HashMap<>();
-        providerProps.put("aries.rsa.keyStore", KEYSTORE2);
-        providerProps.put("aries.rsa.trustStore", TRUSTSTORE);
-        providerProps.put("aries.rsa.keyStorePassword", KEYSTORE_PASSWORD);
-        providerProps.put("aries.rsa.trustStorePassword", TRUSTSTORE_PASSWORD);
+        providerProps.put("aries.tcp.keyStore", KEYSTORE2);
+        providerProps.put("aries.tcp.trustStore", TRUSTSTORE);
+        providerProps.put("aries.tcp.keyStorePassword", KEYSTORE_PASSWORD);
+        providerProps.put("aries.tcp.trustStorePassword", TRUSTSTORE_PASSWORD);
         test(providerProps);
     }
 
     @Test
     public void testKeyAlias() throws IOException {
         HashMap<String, Object> providerProps = new HashMap<>();
-        providerProps.put("aries.rsa.keyAlias", "MyServerKey");
-        providerProps.put("aries.rsa.keyStore", KEYSTORE);
-        providerProps.put("aries.rsa.trustStore", TRUSTSTORE);
-        providerProps.put("aries.rsa.keyStorePassword", KEYSTORE_PASSWORD);
-        providerProps.put("aries.rsa.trustStorePassword", TRUSTSTORE_PASSWORD);
+        providerProps.put("aries.tcp.keyAlias", "MyServerKey");
+        providerProps.put("aries.tcp.keyStore", KEYSTORE);
+        providerProps.put("aries.tcp.trustStore", TRUSTSTORE);
+        providerProps.put("aries.tcp.keyStorePassword", KEYSTORE_PASSWORD);
+        providerProps.put("aries.tcp.trustStorePassword", TRUSTSTORE_PASSWORD);
         test(providerProps);
     }
 
     @Test(expected = RuntimeException.class)
     public void testWrongKeyAlias() throws IOException {
         HashMap<String, Object> providerProps = new HashMap<>();
-        providerProps.put("aries.rsa.keyAlias", "YourService");
-        providerProps.put("aries.rsa.keyStore", KEYSTORE2);
-        providerProps.put("aries.rsa.trustStore", TRUSTSTORE);
-        providerProps.put("aries.rsa.keyStorePassword", KEYSTORE_PASSWORD);
-        providerProps.put("aries.rsa.trustStorePassword", TRUSTSTORE_PASSWORD);
+        providerProps.put("aries.tcp.keyAlias", "YourService");
+        providerProps.put("aries.tcp.keyStore", KEYSTORE2);
+        providerProps.put("aries.tcp.trustStore", TRUSTSTORE);
+        providerProps.put("aries.tcp.keyStorePassword", KEYSTORE_PASSWORD);
+        providerProps.put("aries.tcp.trustStorePassword", TRUSTSTORE_PASSWORD);
         test(providerProps);
     }
 
     @Test(expected = RuntimeException.class)
     public void testMTLSWithoutKeyStore() throws IOException {
         HashMap<String, Object> providerProps = new HashMap<>();
-        providerProps.put("aries.rsa.mtls", "true");
-        providerProps.put("aries.rsa.trustStore", KEYSTORE);
+        providerProps.put("aries.tcp.mtls", "true");
+        providerProps.put("aries.tcp.trustStore", KEYSTORE);
         test(providerProps);
     }
 
     @Test(expected = RuntimeException.class)
     public void testMTLSWithoutTrustStore() throws IOException {
         HashMap<String, Object> providerProps = new HashMap<>();
-        providerProps.put("aries.rsa.mtls", "true");
-        providerProps.put("aries.rsa.trustStore", TRUSTSTORE);
+        providerProps.put("aries.tcp.mtls", "true");
+        providerProps.put("aries.tcp.trustStore", TRUSTSTORE);
         test(providerProps);
     }
 
     @Test
     public void testMTLS() throws IOException {
         HashMap<String, Object> providerProps = new HashMap<>();
-        providerProps.put("aries.rsa.mtls", "true");
-        providerProps.put("aries.rsa.keyStore", KEYSTORE);
-        providerProps.put("aries.rsa.trustStore", TRUSTSTORE);
-        providerProps.put("aries.rsa.keyStorePassword", KEYSTORE_PASSWORD);
-        providerProps.put("aries.rsa.trustStorePassword", TRUSTSTORE_PASSWORD);
+        providerProps.put("aries.tcp.mtls", "true");
+        providerProps.put("aries.tcp.keyStore", KEYSTORE);
+        providerProps.put("aries.tcp.trustStore", TRUSTSTORE);
+        providerProps.put("aries.tcp.keyStorePassword", KEYSTORE_PASSWORD);
+        providerProps.put("aries.tcp.trustStorePassword", TRUSTSTORE_PASSWORD);
         test(providerProps);
     }
 

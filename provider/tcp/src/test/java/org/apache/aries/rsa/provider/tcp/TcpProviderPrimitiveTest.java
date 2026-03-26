@@ -62,8 +62,8 @@ public class TcpProviderPrimitiveTest {
         provider.activate(new HashMap<>());
         Map<String, Object> props = new HashMap<>();
         EndpointHelper.addObjectClass(props, exportedInterfaces);
-        props.put("aries.rsa.hostname", "localhost");
-        props.put("aries.rsa.numThreads", "10");
+        props.put("aries.tcp.hostname", "localhost");
+        props.put("aries.tcp.numThreads", "10");
         PrimitiveServiceImpl myService = new PrimitiveServiceImpl();
         BundleContext bc = EasyMock.mock(BundleContext.class);
         ep = provider.exportService(myService, bc, props, exportedInterfaces);

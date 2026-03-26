@@ -28,20 +28,21 @@ import java.util.UUID;
 public class Config {
 
     // endpoint service properties
-    static final String PORT = "aries.rsa.port";
-    static final String HOSTNAME = "aries.rsa.hostname";
-    static final String BIND_ADDRESS = "aries.rsa.bindAddress";
-    static final String ID = "aries.rsa.id";
-    static final String THREADS = "aries.rsa.numThreads";
+    private static final String PREFIX = TcpProvider.TCP_CONFIG_TYPE + ".";
+    static final String PORT = PREFIX + "port";
+    static final String HOSTNAME = PREFIX + "hostname";
+    static final String BIND_ADDRESS = PREFIX + "bindAddress";
+    static final String ID = PREFIX + "id";
+    static final String THREADS = PREFIX + "numThreads";
     static final String TIMEOUT = "osgi.basic.timeout";
 
     // provider component properties
-    static final String KEYSTORE = "aries.rsa.keyStore";
-    static final String TRUSTSTORE = "aries.rsa.trustStore";
-    static final String KEYSTORE_PASSWORD = "aries.rsa.keyStorePassword";
-    static final String TRUSTSTORE_PASSWORD = "aries.rsa.trustStorePassword";
-    static final String KEY_ALIAS = "aries.rsa.keyAlias";
-    static final String MTLS = "aries.rsa.mtls";
+    static final String KEYSTORE = PREFIX + "keyStore";
+    static final String TRUSTSTORE = PREFIX + "trustStore";
+    static final String KEYSTORE_PASSWORD = PREFIX + "keyStorePassword";
+    static final String TRUSTSTORE_PASSWORD = PREFIX + "trustStorePassword";
+    static final String KEY_ALIAS = PREFIX + "keyAlias";
+    static final String MTLS = PREFIX + "mtls";
 
     static final int DYNAMIC_PORT = 0;
     static final int DEFAULT_TIMEOUT_MILLIS = 300000;
@@ -65,7 +66,11 @@ public class Config {
 
     String getString(String key, String defaultValue) {
         Object value = props.get(key);
-        return value != null ? value.toString() : defaultValue;
+        if (value == null)
+            return defaultValue;
+        if (!(value instanceof String))
+            throw new IllegalArgumentException(key + " is not a string");
+        return value.toString();
     }
 
     public int getPort() {
