@@ -97,6 +97,9 @@ public class TopologyManagerExport implements ServiceListener {
             break;
 
         case ServiceEvent.MODIFIED:
+            // TODO: we should determine whether the properties that changed are normal
+            // service properties that should just be updated, or RSA/distribution
+            // properties that require the service to be re-exported from scratch
             endpointRepo.values().forEach(repo -> repo.modifyService(sref));
             break;
 

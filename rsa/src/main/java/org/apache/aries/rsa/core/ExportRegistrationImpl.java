@@ -22,19 +22,22 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 import org.apache.aries.rsa.core.event.EventProducer;
 import org.apache.aries.rsa.spi.Endpoint;
+import org.apache.aries.rsa.util.StringPlus;
+import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.ExportReference;
 import org.osgi.service.remoteserviceadmin.ExportRegistration;
-import org.osgi.service.remoteserviceadmin.RemoteConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -233,19 +236,50 @@ public class ExportRegistrationImpl implements ExportRegistration, ExportReferen
         return s;
     }
 
+    /**
+     * Merge the old endpoint properties with updated service properties.
+     * Original service properties may have been added, removed, or modified
+     * in the new service properties.
+     * <p>
+     * The service properties do not include RSA/distribution properties
+     * that are added in the export process, since this update comes through
+     * regular service events unrelated to RSA. However, we do need to preserve
+     * those in order for the updated endpoint to be managed and reachable by RSA.
+     * <p>
+     * There is no clear definition of how to determine which properties are such
+     * properties, so we use a heuristic based on the property name prefix.
+     *
+     * @param oldEndpointProps the properties from the existing (pre-update) endpoint
+     * @param newServiceProps the new service properties (without RSA/distribution additions)
+     * @return the merged set of old RSA/distribution properties with new custom properties
+     */
+    private Map<String, Object> merge(Map<String, Object> oldEndpointProps, Map<String, ?> newServiceProps) {
+        List<String> configTypes = StringPlus.normalize(oldEndpointProps.get(Constants.SERVICE_IMPORTED_CONFIGS));
+        // from old props, add only properties we think are RSA/distribution/framework related
+        Map<String, Object> props = oldEndpointProps.entrySet().stream()
+            .filter(e -> {
+                String k = e.getKey().toLowerCase(Locale.ROOT); // case-insensitive
+                return k.startsWith("endpoint.") || k.startsWith("service.") || k.startsWith("osgi.basic.")
+                    || k.equals("objectclass") || configTypes.stream().anyMatch(k::startsWith);
+            }).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        // from new service properties, add all public properties
+        // (plus override any rsa/distribution properties that may be present)
+        newServiceProps.entrySet().stream()
+            .filter(e -> !e.getKey().startsWith("."))
+            .forEach(e -> props.put(e.getKey(), e.getValue()));
+        return props;
+    }
+
     @Override
     public EndpointDescription update(Map<String, ?> properties) {
         if (isInvalid()) {
             throw new IllegalStateException("export registration is invalid or closed");
         }
-
-        Map<String, Object> oldProps = shared.endpoint.getProperties();
-        Map<String, Object> props = new HashMap<>(properties);
-        props.putIfAbsent(RemoteConstants.ENDPOINT_ID, oldProps.get(RemoteConstants.ENDPOINT_ID));
-        props.putIfAbsent(RemoteConstants.SERVICE_IMPORTED_CONFIGS, oldProps.get(RemoteConstants.SERVICE_IMPORTED_CONFIGS));
-
-        shared.endpoint = new EndpointDescription(shared.serviceReference, props);
+        EndpointDescription endpoint = shared.endpoint;
+        Map<String, Object> props = merge(endpoint.getProperties(), properties);
+        endpoint = new EndpointDescription(props);
+        shared.endpoint = endpoint;
         shared.eventProducer.notifyUpdate(this);
-        return shared.endpoint;
+        return endpoint;
     }
 }
