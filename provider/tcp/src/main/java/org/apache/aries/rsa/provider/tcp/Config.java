@@ -27,7 +27,7 @@ import java.util.UUID;
  */
 public class Config {
 
-    // endpoint service properties
+    // configuration properties
     private static final String PREFIX = TcpProvider.TCP_CONFIG_TYPE + ".";
     static final String PORT = PREFIX + "port";
     static final String HOSTNAME = PREFIX + "hostname";
@@ -43,6 +43,9 @@ public class Config {
     static final String TRUSTSTORE_PASSWORD = PREFIX + "trustStorePassword";
     static final String KEY_ALIAS = PREFIX + "keyAlias";
     static final String MTLS = PREFIX + "mtls";
+
+    // endpoint service runtime properties
+    static final String URI = PREFIX + "uri";
 
     static final int DYNAMIC_PORT = 0;
     static final int DEFAULT_TIMEOUT_MILLIS = 300000;
@@ -119,5 +122,9 @@ public class Config {
 
     public boolean isMtls() {
         return Boolean.parseBoolean(getString(MTLS, System.getProperty(MTLS)));
+    }
+
+    public String getUri() {
+        return getString(URI, null);
     }
 }
