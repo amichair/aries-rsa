@@ -37,7 +37,6 @@ import java.util.Set;
 import org.apache.aries.rsa.core.event.EventProducer;
 import org.apache.aries.rsa.spi.DistributionProvider;
 import org.apache.aries.rsa.spi.Endpoint;
-import org.apache.aries.rsa.util.EndpointHelper;
 import org.apache.aries.rsa.util.StringPlus;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -563,7 +562,8 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
         copyEndpointProperties(effectiveProps, props);
         props.remove(org.osgi.framework.Constants.SERVICE_ID);
         props.put(RemoteConstants.SERVICE_EXPORTED_CONFIGS, configTypes);
-        EndpointHelper.addObjectClass(props, ifaces);
+        String[] inames = Arrays.stream(ifaces).map(Class::getName).toArray(String[]::new);
+        props.put(org.osgi.framework.Constants.OBJECTCLASS, inames);
         props.put(RemoteConstants.ENDPOINT_SERVICE_ID, effectiveProps.get(org.osgi.framework.Constants.SERVICE_ID));
         String frameworkUUID = bctx.getProperty(org.osgi.framework.Constants.FRAMEWORK_UUID);
         props.put(RemoteConstants.ENDPOINT_FRAMEWORK_UUID, frameworkUUID);

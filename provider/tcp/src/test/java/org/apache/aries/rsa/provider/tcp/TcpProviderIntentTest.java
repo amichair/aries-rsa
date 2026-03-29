@@ -29,7 +29,6 @@ import java.util.Map;
 import org.apache.aries.rsa.provider.tcp.myservice.MyService;
 import org.apache.aries.rsa.provider.tcp.myservice.MyServiceImpl;
 import org.apache.aries.rsa.spi.Endpoint;
-import org.apache.aries.rsa.util.EndpointHelper;
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
@@ -51,10 +50,16 @@ public class TcpProviderIntentTest {
         myService = new MyServiceImpl(null);
     }
 
+    private Map<String, Object> createProps() {
+        Map<String, Object> props = new HashMap<>();
+        String[] names = Arrays.stream(exportedInterfaces).map(Class::getName).toArray(String[]::new);
+        props.put(org.osgi.framework.Constants.OBJECTCLASS, names);
+        return props;
+    }
+
     @Test
     public void basicAndAsyncIntents() {
-        Map<String, Object> props = new HashMap<>();
-        EndpointHelper.addObjectClass(props, exportedInterfaces);
+        Map<String, Object> props = createProps();
         String[] standardIntents = {"osgi.basic", "osgi.async"};
         props.put(RemoteConstants.SERVICE_EXPORTED_INTENTS, standardIntents);
         Endpoint ep = provider.exportService(myService, bc, props, exportedInterfaces);
@@ -63,8 +68,7 @@ public class TcpProviderIntentTest {
 
     @Test
     public void unknownIntent() {
-        Map<String, Object> props = new HashMap<>();
-        EndpointHelper.addObjectClass(props, exportedInterfaces);
+        Map<String, Object> props = createProps();
         props.put(RemoteConstants.SERVICE_EXPORTED_INTENTS, "unknown");
         Endpoint ep = provider.exportService(myService, bc, props, exportedInterfaces);
         assertThat("Service should not be exported as intent is not supported", ep, nullValue());
@@ -72,8 +76,7 @@ public class TcpProviderIntentTest {
 
     @Test
     public void unknownIntentExtra() {
-        Map<String, Object> props = new HashMap<>();
-        EndpointHelper.addObjectClass(props, exportedInterfaces);
+        Map<String, Object> props = createProps();
         props.put(RemoteConstants.SERVICE_EXPORTED_INTENTS_EXTRA, "unknown");
         Endpoint ep = provider.exportService(myService, bc, props, exportedInterfaces);
         assertThat("Service should not be exported as intent is not supported", ep, nullValue());

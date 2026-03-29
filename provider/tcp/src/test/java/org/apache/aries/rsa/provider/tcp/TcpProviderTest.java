@@ -49,7 +49,6 @@ import org.apache.aries.rsa.provider.tcp.myservice.MyService;
 import org.apache.aries.rsa.provider.tcp.myservice.MyServiceImpl;
 import org.apache.aries.rsa.spi.Endpoint;
 import org.apache.aries.rsa.spi.ImportedService;
-import org.apache.aries.rsa.util.EndpointHelper;
 import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Assert;
@@ -88,7 +87,7 @@ public class TcpProviderTest {
         TcpProvider provider = new TcpProvider();
         provider.activate(new HashMap<>());
         Map<String, Object> props = new HashMap<>();
-        EndpointHelper.addObjectClass(props, exportedInterfaces);
+        props.put(org.osgi.framework.Constants.OBJECTCLASS, new String[] {MyService.class.getName()});
         int port = getFreePort();
         props.put("aries.tcp.hostname", "localhost");
         props.put("aries.tcp.port", port);

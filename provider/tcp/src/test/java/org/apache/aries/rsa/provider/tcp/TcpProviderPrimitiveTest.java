@@ -39,7 +39,6 @@ import org.apache.aries.rsa.provider.tcp.myservice.PrimitiveService;
 import org.apache.aries.rsa.provider.tcp.myservice.PrimitiveServiceImpl;
 import org.apache.aries.rsa.spi.Endpoint;
 import org.apache.aries.rsa.spi.ImportedService;
-import org.apache.aries.rsa.util.EndpointHelper;
 import org.easymock.EasyMock;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -61,7 +60,7 @@ public class TcpProviderPrimitiveTest {
         TcpProvider provider = new TcpProvider();
         provider.activate(new HashMap<>());
         Map<String, Object> props = new HashMap<>();
-        EndpointHelper.addObjectClass(props, exportedInterfaces);
+        props.put(org.osgi.framework.Constants.OBJECTCLASS, new String[] {PrimitiveService.class.getName()});
         props.put("aries.tcp.hostname", "localhost");
         props.put("aries.tcp.numThreads", "10");
         PrimitiveServiceImpl myService = new PrimitiveServiceImpl();
