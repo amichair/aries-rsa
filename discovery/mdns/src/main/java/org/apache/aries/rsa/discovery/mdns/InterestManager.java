@@ -189,7 +189,10 @@ public class InterestManager {
         if(LOG.isInfoEnabled()) {
             LOG.info("Service {} has changed its interest in endpoint events", id);
         }
-        
-        interests.get(id).update(props);
+
+        Interest interest = interests.get(id);
+        if (interest != null) {
+            interest.update(props);
+        }
     }
 }
